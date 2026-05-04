@@ -37,7 +37,7 @@ public class JwtUtils {
   }
   
   private Key key() {
-    return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+      return Keys.hmacShaKeyFor(jwtSecret.getBytes());
   }
 
   public String getUserNameFromJwtToken(String token) {
@@ -47,7 +47,7 @@ public class JwtUtils {
 
   public boolean validateJwtToken(String authToken) {
     try {
-      Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
+      Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken);
       return true;
     } catch (MalformedJwtException e) {
       logger.error("Invalid JWT token: {}", e.getMessage());
