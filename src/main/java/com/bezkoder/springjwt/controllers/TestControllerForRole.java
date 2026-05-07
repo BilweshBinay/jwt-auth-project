@@ -55,6 +55,7 @@ public class TestControllerForRole {
         }
 
         userRepository.save(user);
+        System.out.println("Updated Profile successfully");
         return ResponseEntity.ok("Profile updated Successfully");
     }
 }
