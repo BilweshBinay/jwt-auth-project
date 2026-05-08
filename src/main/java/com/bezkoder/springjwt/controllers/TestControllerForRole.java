@@ -1,25 +1,28 @@
 package com.bezkoder.springjwt.controllers;
 
 import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.payload.request.ChangePasswordRequest;
 import com.bezkoder.springjwt.payload.request.UpdateProfileRequest;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import com.bezkoder.springjwt.security.services.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class TestControllerForRole {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -58,5 +61,38 @@ public class TestControllerForRole {
         System.out.print("Updated Profile successfully");
 
         return ResponseEntity.ok("Profile updated Successfully");
+    }
+
+    @PostMapping("/api/user/change-password")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('USER')")
+    public ResponseEntity<?> changePassword(
+            @RequestBody ChangePasswordRequest request) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        UserDetailsImpl userDetails =
+                (UserDetailsImpl) authentication.getPrincipal();
+
+        User user = userRepository.findById(userDetails.getId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        boolean isPasswordCorrect =
+                passwordEncoder.matches(
+                        request.getOldPassword(),
+                        user.getPassword());
+
+        if (!isPasswordCorrect) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Old password is incorrect");
+        }
+
+        user.setPassword(
+                passwordEncoder.encode(request.getNewPassword()));
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password changed successfully");
     }
 }
