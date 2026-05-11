@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.bezkoder.springjwt.models.RefreshToken;
+import com.bezkoder.springjwt.repository.RefreshTokenRepository;
+import com.bezkoder.springjwt.security.services.RefreshTokenService;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +54,9 @@ public class AuthController {
   @Autowired
   JwtUtils jwtUtils;
 
+  @Autowired
+  private RefreshTokenRepository refreshTokenRepository;
+
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -59,17 +65,22 @@ public class AuthController {
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = jwtUtils.generateJwtToken(authentication);
+
+      RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
     
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();    
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
-    return ResponseEntity.ok(new JwtResponse(jwt, 
-                         userDetails.getId(), 
-                         userDetails.getUsername(), 
-                         userDetails.getEmail(), 
-                         roles));
+      return ResponseEntity.ok(
+              new JwtResponse(
+                      jwt,
+                      refreshToken.getToken(),
+                      userDetails.getId(),
+                      userDetails.getUsername(),
+                      userDetails.getEmail(),
+                      roles));
   }
 
   @PostMapping("/signup")
