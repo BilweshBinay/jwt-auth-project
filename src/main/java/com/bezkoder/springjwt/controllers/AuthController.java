@@ -57,18 +57,24 @@ public class AuthController {
   @Autowired
   private RefreshTokenRepository refreshTokenRepository;
 
+  @Autowired
+  private RefreshTokenService refreshTokenService;
+
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+
 
     Authentication authentication = authenticationManager.authenticate(
         new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
     SecurityContextHolder.getContext().setAuthentication(authentication);
     String jwt = jwtUtils.generateJwtToken(authentication);
-
-      RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
     
-    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();    
+    UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+
+    RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());

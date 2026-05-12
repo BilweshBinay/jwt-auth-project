@@ -5,16 +5,28 @@ import jakarta.persistence.*;
 import java.time.Instant;
 
 @Entity
-@Table (name = "refresh_token")
+@Table(name = "refresh_token")
 public class RefreshToken {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String token;
+
     private Instant expiryDate;
+
     @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getToken() {
         return token;
@@ -28,8 +40,8 @@ public class RefreshToken {
         return expiryDate;
     }
 
-    public void setExpiryDate(Instant expiresDate) {
-        this.expiryDate = expiresDate;
+    public void setExpiryDate(Instant expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public User getUser() {
@@ -38,13 +50,5 @@ public class RefreshToken {
 
     public void setUser(User user) {
         this.user = user;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }
