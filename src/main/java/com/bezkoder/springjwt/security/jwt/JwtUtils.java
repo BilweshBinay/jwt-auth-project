@@ -40,10 +40,28 @@ public class JwtUtils {
       return Keys.hmacShaKeyFor(jwtSecret.getBytes());
   }
 
-  public String getUserNameFromJwtToken(String token) {
-    return Jwts.parserBuilder().setSigningKey(key()).build()
-               .parseClaimsJws(token).getBody().getSubject();
-  }
+    public String generateTokenFromUsername(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String getUserNameFromJwtToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
+    }
+
+//  public String getUserNameFromJwtToken(String token) {
+//    return Jwts.parserBuilder().setSigningKey(key()).build()
+//               .parseClaimsJws(token).getBody().getSubject();
+//  }
 
   public boolean validateJwtToken(String authToken) {
     try {
