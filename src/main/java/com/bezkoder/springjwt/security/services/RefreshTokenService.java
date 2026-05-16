@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.security.services;
 
+import com.bezkoder.springjwt.exception.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.RefreshToken;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.repository.RefreshTokenRepository;
@@ -45,7 +46,7 @@ public class RefreshTokenService {
         if (token.getExpiryDate().isBefore(Instant.now())){
             refreshTokenRepository.delete(token);
 
-            throw new RuntimeException("Refresh token was expired. Please login again");
+            throw new ResourceNotFoundException("Refresh token was expired. Please login again");
         }
         return token;
     }

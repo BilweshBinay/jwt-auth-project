@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.controllers;
 
+import com.bezkoder.springjwt.exception.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.RefreshToken;
 import com.bezkoder.springjwt.payload.request.TokenRefreshRequest;
 import com.bezkoder.springjwt.payload.response.TokenRefreshResponse;
@@ -51,7 +52,7 @@ public class refreshtokenController {
                     return ResponseEntity.ok(response);
                 })
                 .orElseThrow(() ->
-                        new RuntimeException("Refresh token is not in database"));
+                        new ResourceNotFoundException("Refresh token is not in database"));
     }
 
 //    public String generateTokenFromUsername(String username) {

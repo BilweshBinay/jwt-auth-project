@@ -1,5 +1,6 @@
 package com.bezkoder.springjwt.controllers;
 
+import com.bezkoder.springjwt.exception.ResourceNotFoundException;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.payload.request.ChangePasswordRequest;
 import com.bezkoder.springjwt.payload.request.UpdateProfileRequest;
@@ -49,7 +50,7 @@ public class TestControllerForRole {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         User user = userRepository.findById(userDetails.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setEmail(request.getEmail());
 
